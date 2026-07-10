@@ -21,12 +21,8 @@ S3_BUCKET = os.environ.get("S3_BUCKET", "")
 
 PROFILE = {
     "name": "Anas Nadaf",
-    "title": "ML & Backend Engineer",
-    "summary": (
-        "I build ML pipelines and backend systems: counterparty extraction, "
-        "transaction categorisation with LLMs, Ray-based inference services, "
-        "and evaluation tooling."
-    ),
+    "title": "AI & ML Engineer",
+    "summary": "AI and ML engineer building AI pipelines and ML solutions.",
     "email": "anaswillreply@gmail.com",
 }
 
@@ -36,6 +32,7 @@ TECHNOLOGIES = [
     {"name": "FastAPI", "slug": "fastapi"},
     {"name": "React", "slug": "react"},
     {"name": "PostgreSQL", "slug": "postgresql"},
+    {"name": "SQLite", "slug": "sqlite"},
     {"name": "Apache Kafka", "slug": "apachekafka"},
     {"name": "OpenSearch", "slug": "opensearch"},
     {"name": "Elasticsearch", "slug": "elasticsearch"},
@@ -43,12 +40,17 @@ TECHNOLOGIES = [
     {"name": "PyTorch", "slug": "pytorch"},
     {"name": "Hugging Face", "slug": "huggingface"},
     {"name": "scikit-learn", "slug": "scikitlearn"},
+    {"name": "Pandas", "slug": "pandas"},
+    {"name": "NumPy", "slug": "numpy"},
     {"name": "Ray", "slug": "ray"},
+    {"name": "MLflow", "slug": "mlflow"},
+    {"name": "DVC", "slug": "dvc"},
+    {"name": "Streamlit", "slug": "streamlit"},
+    {"name": "Plotly", "slug": "plotly"},
     {"name": "Prometheus", "slug": "prometheus"},
     {"name": "Docker", "slug": "docker"},
-    {"name": "DVC", "slug": "dvc"},
-    {"name": "Plotly", "slug": "plotly"},
-    {"name": "OpenAI", "slug": "openai"},
+    {"name": "Kubernetes", "slug": "kubernetes"},
+    {"name": "WebAssembly", "slug": "webassembly"},
 ]
 
 
