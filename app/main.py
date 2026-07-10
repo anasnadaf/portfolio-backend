@@ -4,8 +4,10 @@ import uuid
 from datetime import datetime, timezone
 
 import boto3
+from botocore.exceptions import ClientError
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from pydantic import BaseModel, EmailStr
 
 app = FastAPI(title="portfolio-backend")
@@ -76,6 +78,21 @@ def technologies():
         {"name": t["name"], "logo": f"https://cdn.simpleicons.org/{t['slug']}"}
         for t in TECHNOLOGIES
     ]
+
+
+@app.get("/api/profile-pic")
+def profile_pic():
+    if not S3_BUCKET:
+        raise HTTPException(status_code=503, detail="storage not configured")
+    try:
+        obj = boto3.client("s3").get_object(Bucket=S3_BUCKET, Key="site/profilePic.jpg")
+    except ClientError:
+        raise HTTPException(status_code=404, detail="not found")
+    return Response(
+        content=obj["Body"].read(),
+        media_type="image/jpeg",
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
 
 
 @app.post("/api/contact")
