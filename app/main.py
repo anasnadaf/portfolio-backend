@@ -1,11 +1,13 @@
 import json
 import os
+import urllib.error
+import urllib.request
 import uuid
 from datetime import datetime, timezone
 
 import boto3
 from botocore.exceptions import ClientError
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from pydantic import BaseModel, EmailStr
@@ -20,6 +22,8 @@ app.add_middleware(
 )
 
 S3_BUCKET = os.environ.get("S3_BUCKET", "")
+AUTH_URL = os.environ.get("AUTH_URL", "http://auth:8081")
+RESUME_KEY = "site/anas-nadaf-resume.pdf"
 
 PROFILE = {
     "name": "Anas Nadaf",
@@ -92,6 +96,40 @@ def profile_pic():
         content=obj["Body"].read(),
         media_type="image/jpeg",
         headers={"Cache-Control": "public, max-age=86400"},
+    )
+
+
+def require_auth(authorization: str | None):
+    """Validate a bearer token against the auth service, which owns the JWT secret."""
+    if not authorization or not authorization.lower().startswith("bearer "):
+        raise HTTPException(status_code=401, detail="authentication required")
+    req = urllib.request.Request(
+        f"{AUTH_URL}/auth/me", headers={"Authorization": authorization}
+    )
+    try:
+        urllib.request.urlopen(req, timeout=5).close()
+    except urllib.error.HTTPError:
+        raise HTTPException(status_code=401, detail="invalid token")
+    except urllib.error.URLError:
+        raise HTTPException(status_code=503, detail="auth unavailable")
+
+
+@app.get("/api/resume")
+def resume(authorization: str | None = Header(default=None)):
+    require_auth(authorization)
+    if not S3_BUCKET:
+        raise HTTPException(status_code=503, detail="storage not configured")
+    try:
+        obj = boto3.client("s3").get_object(Bucket=S3_BUCKET, Key=RESUME_KEY)
+    except ClientError:
+        raise HTTPException(status_code=404, detail="not found")
+    return Response(
+        content=obj["Body"].read(),
+        media_type="application/pdf",
+        headers={
+            "Cache-Control": "private, no-store",
+            "Content-Disposition": 'inline; filename="anas-nadaf-resume.pdf"',
+        },
     )
 
 
